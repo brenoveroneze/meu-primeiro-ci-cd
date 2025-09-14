@@ -10,7 +10,7 @@ on:
   pull_request:
     branches: [ main ]
 
-# Jobs: define as tarefas que serão executadas.
+# Jobs: define as tarefas que serão executadas
 jobs:
   # 'build' é o ID do nosso job. Você pode nomeá-lo como quiser.
   build:
