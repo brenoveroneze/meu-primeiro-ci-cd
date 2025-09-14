@@ -1,39 +1,46 @@
 # Nome do seu workflow. Aparecerá na aba "Actions" do seu repositório.
-name: CI para Projeto Node.js
+name: CI para Projeto Node.js com SonarCloud
 
 # Gatilho (trigger): define quando o workflow deve ser executado.
 on:
-  # Executa em todo 'push' para a branch 'main'.
   push:
     branches: [ main ]
-  # Também executa em 'pull requests' abertos para a branch 'main'.
   pull_request:
     branches: [ main ]
 
-# Jobs: define as tarefas que serão executadas
 jobs:
-  # 'build' é o ID do nosso job. Você pode nomeá-lo como quiser.
   build:
-    # Define o sistema operacional da máquina virtual que executará o job.
     runs-on: ubuntu-latest
 
-    # Passos (steps) a serem executados sequencialmente.
     steps:
-      # Passo 1: Baixa o seu código do repositório para a máquina virtual.
       - name: Checkout do código
         uses: actions/checkout@v3
+        with:
+          # Faz o fetch de todo o histórico para que o Sonar possa fazer uma análise mais completa
+          fetch-depth: 0
 
-      # Passo 2: Configura a versão do Node.js que queremos usar.
       - name: Configurar Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18' # Você pode especificar a versão que seu projeto usa.
-          cache: 'npm' # Opcional: acelera a instalação de dependências em execuções futuras.
+          node-version: '18'
+          cache: 'npm'
 
-      # Passo 3: Instala as dependências do projeto.
       - name: Instalar dependências
         run: npm ci
 
-      # Passo 4: Executa o script de teste definido no package.json.
       - name: Rodar os testes
         run: npm test
+
+      # --- NOVO PASSO ADICIONADO AQUI ---
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          # Token de acesso para o SonarCloud, armazenado nos Secrets do GitHub
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          # Estes valores são encontrados na página do seu projeto no SonarCloud
+          # Vá em "Project Information" para encontrá-los
+          args: >
+            -Dsonar.projectKey=brenoveroneze_meu-primeiro-ci-cd
+            -Dsonar.organization=brenoveroneze
