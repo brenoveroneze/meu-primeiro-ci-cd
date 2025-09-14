@@ -32,7 +32,7 @@ jobs:
 
       # Passo 3: Instala as dependências do projeto.
       - name: Instalar dependências
-        run: npm install
+        run: npm ci
 
       # Passo 4: Executa o script de teste definido no package.json.
       - name: Rodar os testes
